@@ -4,7 +4,7 @@ import os
 import json
 
 # Configure API key for Google Gemini
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+genai.configure(api_key=os.getenv("AIzaSyC_IdYlWLiCXtVvn2qlLZIFgD6Rm9Smg5U"))
 
 # Load user credentials from Streamlit Secrets
 USER_CREDENTIALS = json.loads(st.secrets["USER_CREDENTIALS"])
