@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .links a {
+            display: block;
+            margin-top: 10px;
+            color: #007BFF;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-page">
+        <h2>Customer Login</h2>
+        <form onsubmit="return handleLogin(event)">
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="Enter your email" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="button">Login</button>
+            <div class="links">
+                <a href="#" onclick="showRegisterPage()">Create an Account</a>
+                <a href="#" onclick="showForgotPasswordPage()">Forgot Password?</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="container" id="register-page" style="display: none;">
+        <h2>Create an Account</h2>
+        <form onsubmit="return handleRegister(event)">
+            <div class="input-group">
+                <label for="new-email">Email</label>
+                <input id="new-email" type="email" placeholder="Enter your email" required>
+            </div>
+            <div class="input-group">
+                <label for="new-password">Password</label>
+                <input id="new-password" type="password" placeholder="Enter your password" required>
+            </div>
+            <div class="input-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input id="confirm-password" type="password" placeholder="Confirm your password" required>
+            </div>
+            <button type="submit" class="button">Register</button>
+            <div class="links">
+                <a href="#" onclick="showLoginPage()">Already have an account? Login</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="container" id="forgot-password-page" style="display: none;">
+        <h2>Forgot Password</h2>
+        <form onsubmit="return handleForgotPassword(event)">
+            <div class="input-group">
+                <label for="reset-email">Email</label>
+                <input id="reset-email" type="email" placeholder="Enter your email" required>
+            </div>
+            <button type="submit" class="button">Reset Password</button>
+            <div class="links">
+                <a href="#" onclick="showLoginPage()">Back to Login</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+
+        function handleLogin(event) {
+                event.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                // Retrieve stored users
+                let users = JSON.parse(localStorage.getItem("users")) || {};
+
+                if (users[email] && users[email] === password) {
+                    alert("Login Successful! Redirecting...");
+
+                    // Delay redirect slightly to avoid issues
+                    setTimeout(() => {
+                        window.location.href = "https://energyconsumption-ceschyr4zosnkfmjoffaqk.streamlit.app/";
+                    }, 1000);
+                } else {
+                    alert("Invalid Email or Password. Try again!");
+                }
+            }
+
+
+            function handleRegister(event) {
+                event.preventDefault();
+                const email = document.getElementById('new-email').value;
+                const password = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (password !== confirmPassword) {
+                    alert("Passwords do not match!");
+                    return;
+                }
+
+                fetch('http://127.0.0.1:5000/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.success) showLoginPage();
+                })
+                .catch(error => console.error("Error:", error));
+            }
+
+
+
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            const email = document.getElementById('reset-email').value;
+
+            let users = JSON.parse(localStorage.getItem("users")) || {};
+            if (users[email]) {
+                alert("Password reset link sent (Demo). Your password is: " + users[email]);
+            } else {
+                alert("Email not found. Please register.");
+            }
+        }
+
+        function showRegisterPage() {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('register-page').style.display = 'block';
+            document.getElementById('forgot-password-page').style.display = 'none';
+        }
+
+        function showLoginPage() {
+            document.getElementById('register-page').style.display = 'none';
+            document.getElementById('forgot-password-page').style.display = 'none';
+            document.getElementById('login-page').style.display = 'block';
+        }
+
+        function showForgotPasswordPage() {
+            document.getElementById('login-page').style.display = 'none';
+            document.getElementById('register-page').style.display = 'none';
+            document.getElementById('forgot-password-page').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
